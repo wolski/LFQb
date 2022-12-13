@@ -2,7 +2,7 @@
 
 ### Literature:
 # Demichev, Vadim, et al. "DIA-NN: neural networks and interference correction enable deep proteome coverage in high throughput." Nature methods 17.1 (2020): 41-44.
-# Kuharev, Jörg, et al. "In-depth evaluation of software tools for data-independent acquisition based label-free quantification." Proteomics 15.18 (2015): 3140-3151.
+# Kuharev, J?rg, et al. "In-depth evaluation of software tools for data-independent acquisition based label-free quantification." Proteomics 15.18 (2015): 3140-3151.
 # Navarro, Pedro, et al. "A multicenter study benchmarks software tools for label-free proteome quantification." Nature biotechnology 34.11 (2016): 1130-1136.
 # Ritchie, Matthew E., et al. "limma powers differential expression analyses for RNA-sequencing and microarray studies." Nucleic acids research 43.7 (2015): e47-e47.
 
@@ -13,7 +13,7 @@
 # of this script. Please excuse if the code is not elegant
 # as I am a beginner with R. I am thankful for suggestions.
 # This script was inspired by the "classical LFQbench papers"
-# (Kuharev et al. and Navarro et al.), 
+# (Kuharev et al. and Navarro et al.),
 # and serves as an alternative for the related packages and scripts.
 
 
@@ -57,7 +57,7 @@
 # This folder must contain exactly one protein group
 # and precursor .tsv matrix with DIA-NN style column names
 # with "pg_matrix" and "pr_matrix" in the respective filenames.
-# Usage of +MBR requires the undesired first-pass or 
+# Usage of +MBR requires the undesired first-pass or
 # second pass matrices to be moved away , e.g. into a subfolder.
 
 
@@ -67,7 +67,7 @@
 
 # This script assumes human to be stable, yeast up, and both E.coli
 # and C.elegans to be ownregulated. Any deviation requires minor adaption of
-# the function f.LFQbenchmark.limma.interpretation according 
+# the function f.LFQbenchmark.limma.interpretation according
 # to the examples, otherwise the confusion matrix summary stats become nonsense.
 
 
@@ -96,7 +96,7 @@
 # classical Sample B: 65% Human, 15% Yeast, 20% E.coli
 # Often measured with ca. 3 technical replicates.
 
-# Note: This script works directly on 2-species (Human,Yeast) and 
+# Note: This script works directly on 2-species (Human,Yeast) and
 # 4-species benchmarks (Human, Yeast, E.coli, C.elegans).
 # Please note instructions in the "To run this script" section
 
@@ -105,12 +105,12 @@
 ### Analysis
 # When comparing peptide and protein group fold-changes from sample B to A,
 # one expects Human entries to be stable, Yeast 2x up, and E.coli
-# 4x down-regulated (non-log scale, based on sample mixtures). The benchmarks reveal to what extent 
+# 4x down-regulated (non-log scale, based on sample mixtures). The benchmarks reveal to what extent
 # measured log2 fold-changes deviate from expected log2 fold-changes,
 # including e.g. global over-or underestimation and identification errors
 # that often remain invisible by not having expectation values available.
 # This script has a strong focus on visualizing and measuring the degree
-# of log2 fold-change over-or underestimation, (also called ratio compression 
+# of log2 fold-change over-or underestimation, (also called ratio compression
 # or ratio expansion), mainly with the Asymmetry_Factor.
 
 
@@ -129,11 +129,11 @@
 # Apart from just matching measured against expected log2 fold-changes
 # the protein groups are subjected to differential expression analysis
 # using limma. It is measured which protein groups are up-regulated,
-# down-regulated, or stable. These results are matched against the 
+# down-regulated, or stable. These results are matched against the
 # expectations (all Human ones are stable, all Yeast ones are up-regulated,
 # all E.coli ones are down-regulated).
 
-# Examples: 
+# Examples:
 # A Yeast protein group measured as up-regulated is a true positive.
 # A Human protein group measured as stable is a true-negative.
 # A human protein group measured as up-regulated is a false positive.
@@ -154,9 +154,9 @@
 
 # 2) Check for appropriate normalisation.
 # Potential erroneous offsets (medians or scatter plots) could invalidate the
-# summary stats generated. While ratio compression or expansion can move 
-# Yeast and E.coli medians, the critical normalisation related errors typically shift 
-# Human and Yeast medians or data points by the same distance and direction 
+# summary stats generated. While ratio compression or expansion can move
+# Yeast and E.coli medians, the critical normalisation related errors typically shift
+# Human and Yeast medians or data points by the same distance and direction
 # on the log2 fold-change axis.
 
 
@@ -173,18 +173,18 @@
 
 # 4) Check fold-change over-or underestimation.
 # One of the most overlooked issues in quantitative proteomics.
-# Orbitrap data might result in ratio expansion while ToF data might result in the 
+# Orbitrap data might result in ratio expansion while ToF data might result in the
 # opposing ratio compression, both cases depend on the analysis settings.
 # A separate data frame and output file lists multiple stats related to these.
-# The most useful one seems to be the Asymmetry_Factor. 
+# The most useful one seems to be the Asymmetry_Factor.
 
-# A Factor of 1 means perfect symmetry and no bias. 
+# A Factor of 1 means perfect symmetry and no bias.
 # 0.5 indicates a strong and undesirable underestimation, leading to slightly differentially
 # abundant proteins not recognized correctly as such.
 # The increased number of false negatives means
 # differential expression results can be reliable but less sensitive.
 # An Asymmetry_Factor of 2 indicates a strong and undesired fold-change overestimation.
-# Might lead to a slightly increased deFDR and false positive rate 
+# Might lead to a slightly increased deFDR and false positive rate
 # in differential expression applications.
 
 
@@ -194,14 +194,14 @@
 # it seems well sufficient if a result set ends up with average and median
 # CV at or below 5 %. The value aimed at might vary based on replicate number,
 # proteome coverage, and intended application outside of benchmarks.
-# While workflows with higher values might be reliable, a loss of 
+# While workflows with higher values might be reliable, a loss of
 # sensitivity in differential expression applications is expected at some point.
 
 
 # 6) When optimizing, DIA-NN or instrument settings, etc.,
 # aim to stay within a specified deFDR and ratio compression / extension
-# while maximizing the true positive count. A TP count exceeding 2500 is quite good, 
-# 3000 seems hard to reach and might be close to the upper limit. The scaling is non-linear, 
+# while maximizing the true positive count. A TP count exceeding 2500 is quite good,
+# 3000 seems hard to reach and might be close to the upper limit. The scaling is non-linear,
 # increasing from 2.5k to 3k is more difficult than from 2k to 2.5k.
 
 
@@ -213,13 +213,14 @@
 # Clear environment, RStudio plots, console, and packages.
 # Will not clear package namespaces imported by other packages.
 rm(list = ls())
-dev.off(dev.list()["RStudioGD"])
-invisible(lapply(
-  paste0('package:', names(sessionInfo()$otherPkgs)),
-  detach,
-  character.only = TRUE,
-  unload = TRUE
-))
+#dev.off(dev.list()["RStudioGD"])
+# invisible(lapply(
+#   paste0('package:', names(sessionInfo()$otherPkgs)),
+#   detach,
+#   character.only = TRUE,
+#   unload = TRUE
+# ))
+
 cat("\014")
 
 
@@ -249,7 +250,7 @@ pacman::p_load(
 # Have updated bioconductor packages.
 # Update or install often prohibited by RStudio not allowed to write in folders.
 # Try open RStudio "run as administrator" and use .libPaths() to find and manually
-# delete folders via windows file explorer to allow fresh re-install. 
+# delete folders via windows file explorer to allow fresh re-install.
 
 
 ### Pre-typed to install bioconductor packages.
@@ -280,11 +281,11 @@ script_version <- "v3.2"
 # Recommend use of "path copy copy".
 # See "To run this Script" section for input requirements.
 folder_input <- "//fileserver/project_jumel/All_LFQ_benchmarks/Reanalysis_external/Reanalysis_LFQbench_PXD028735/diaPASEF/diaPASEF06"
-
+folder_input <- "Example_Input/"
 
 
 # Naming the 2 different benchmark sample mixtures.
-# This is just for record-keeping and preventing manual errors 
+# This is just for record-keeping and preventing manual errors
 # when assigning columns to input categories below.
 cond_ctr <- "LFQ_B"
 cond_exp <- "LFQ_A"
@@ -339,7 +340,7 @@ color_yeast <- "#d85f02"
 color_ecoli <- "#7570b2"
 color_celegans <-  "darkred"
 
-# These plot limits are set a bit higher (0.2) than 
+# These plot limits are set a bit higher (0.2) than
 # needed to prevent value clipping with density plots.
 # (Intentionally to prevent bug causing color loss)
 FC_max <- +3.2
@@ -354,22 +355,22 @@ plot_res <- 900
 
 
 ### Explanation variables:
-# script_name and script_version are used in filenames 
+# script_name and script_version are used in filenames
 # of exported folders,tables and plots.
 
-# folder_input is a folder containing one DIA-NN 
+# folder_input is a folder containing one DIA-NN
 # protein group and precursor matrix to analyze.
 # See "To run this script" section.
 
-# cond_ctr and cond_exp contain names for the 2 conditions 
+# cond_ctr and cond_exp contain names for the 2 conditions
 # (benchmark sample mixtures).
 
-# col_exp_Prot etc. are the column indices for the 
+# col_exp_Prot etc. are the column indices for the
 # quantitative values in protein group and precursor matrices,
 # in both cases for the experimental and control condition.
 
-# limit_MV indicates the desired limit for missingness 
-# of quantitative values. e.g. (2/4) or 0.5 means an entry 
+# limit_MV indicates the desired limit for missingness
+# of quantitative values. e.g. (2/4) or 0.5 means an entry
 # passes the respective filter step if at least
 # 2 of 4 replicate measurements provide a non-0 and non-NA value
 # in both conditions. Entries passing are called "IDs" or "identified".
@@ -377,21 +378,21 @@ plot_res <- 900
 # rep_max and rep_min indicate the range of value counts per condition.
 
 # limit_CV indicates the limit of standard deviation in
-# form of the coefficient of variation in %. 
-# Entries are considered precise and pass the respective filter 
-# if the CV is below e.g. 20 % in both conditions. 
+# form of the coefficient of variation in %.
+# Entries are considered precise and pass the respective filter
+# if the CV is below e.g. 20 % in both conditions.
 # Entries passing are called "quantified".
 
-# Measured log2 fold-changed between +- limit_FC are always 
+# Measured log2 fold-changed between +- limit_FC are always
 # considered as "NOT sign. up- or down-regulated",
 # no matter the limma result (p_adj).
 # This value might be set to be between 0.5-1.0 .
 
-# alpha_limma is the stat. significance cutoff 
+# alpha_limma is the stat. significance cutoff
 # for the p_adj of limma. Always compare the resulting deFDR to this value,
 # an excess false positive rate indicates potential errors in the data.
 
-# expFC_ecoli and similar refer to the species-specific 
+# expFC_ecoli and similar refer to the species-specific
 # expected log2 fold-changes.
 # The values are based on mixing ratios of LFQbenchmark samples A and B.
 
@@ -497,8 +498,8 @@ write.csv(variables,
 
 
 
-       
-       
+
+
 
 
 # Functions ---------------------------------------------------------------
@@ -531,28 +532,28 @@ f.import.matrix <- function(a.folder,
 # Remove filepath and suffix, remainder is used as replicate name.
 # e.g. Prot1 <- f.strip.sample.column.name(Prot1, col_ctr_Prot)
 f.strip.sample.column.name <- function(a.df, a.columns) {
-  
+
   names(a.df)[a.columns] <- gsub(".raw$", "", names(a.df)[a.columns])
   names(a.df)[a.columns] <- gsub(".dia$", "", names(a.df)[a.columns])
   names(a.df)[a.columns] <- gsub(".mzML$", "", names(a.df)[a.columns])
   names(a.df)[a.columns] <- gsub(".wiff$", "", names(a.df)[a.columns])
   names(a.df)[a.columns] <- gsub(".wiff2$", "", names(a.df)[a.columns])
   names(a.df)[a.columns] <- gsub(".d$", "", names(a.df)[a.columns])
-  
+
   names(a.df)[a.columns] <- gsub(".raw$", "", names(a.df)[a.columns])
   names(a.df)[a.columns] <- gsub(".dia$", "", names(a.df)[a.columns])
   names(a.df)[a.columns] <- gsub(".mzML$", "", names(a.df)[a.columns])
   names(a.df)[a.columns] <- gsub(".wiff$", "", names(a.df)[a.columns])
   names(a.df)[a.columns] <- gsub(".wiff2$", "", names(a.df)[a.columns])
   names(a.df)[a.columns] <- gsub(".d$", "", names(a.df)[a.columns])
-  
+
   names(a.df)[a.columns] <- gsub(".raw$", "", names(a.df)[a.columns])
   names(a.df)[a.columns] <- gsub(".dia$", "", names(a.df)[a.columns])
   names(a.df)[a.columns] <- gsub(".mzML$", "", names(a.df)[a.columns])
   names(a.df)[a.columns] <- gsub(".wiff$", "", names(a.df)[a.columns])
   names(a.df)[a.columns] <- gsub(".wiff2$", "", names(a.df)[a.columns])
   names(a.df)[a.columns] <- gsub(".d$", "", names(a.df)[a.columns])
-  
+
   names(a.df)[a.columns] <- basename(names(a.df)[a.columns])
   # names(a.df)[a.columns] <- sub(".[^.]+$", "", colnames(a.df)[a.columns])
   return(a.df)
@@ -576,7 +577,7 @@ f.remove.MQ.cont <- function(a.df) {
 
 
 # For each entry and condition, calculate stats of the replicate measurements
-# such as count of non-0 and non-NA values, mean, standard deviation, 
+# such as count of non-0 and non-NA values, mean, standard deviation,
 # coefficient of variation (CV - standard deviation in % of the mean)
 # e.g. Prot1 <- f.row.stats(Prot1, col_ctr_Prot, col_exp_Prot)
 f.row.stats <- function(a.df, a.col_ctr, a.col_exp) {
@@ -585,13 +586,13 @@ f.row.stats <- function(a.df, a.col_ctr, a.col_exp) {
   a.df[, "ctr_SD"]    <-
     rowSds(as.matrix(a.df[, a.col_ctr]), na.rm = TRUE)
   a.df[, "ctr_CV"]    <- a.df[, "ctr_SD"] / a.df[, "ctr_mean"] * 100
-  
+
   a.df[, "exp_count"] <- apply(!is.na (a.df[, a.col_exp]), 1, sum)
   a.df[, "exp_mean"]  <- rowMeans(a.df[, a.col_exp], na.rm = TRUE)
   a.df[, "exp_SD"]    <-
     rowSds(as.matrix(a.df[, a.col_exp]), na.rm = TRUE)
   a.df[, "exp_CV"]    <- a.df[, "exp_SD"] / a.df[, "exp_mean"] * 100
-  
+
   return(a.df)
 }
 
@@ -600,110 +601,110 @@ f.row.stats <- function(a.df, a.col_ctr, a.col_exp) {
 
 # For LFQbenchmark experiments, perform a row of basic data sanitation
 # to prepare for later following data filtering.
-# This contains annotating entries with respective species 
+# This contains annotating entries with respective species
 # and retaining only single-species entries.
 # e.g. Prot1 <- f.LFQbenchmark.basics(Prot0, col_ctr_Prot, col_exp_Prot)
 f.LFQbenchmark.basics <- function(a.df,
                               a.col_ctr,
                               a.col_exp) {
-  
+
 
   # Replace 0 with NA. "0" is sometimes used as mock value.
   # The mock value should not enter any calculation
   # and the event should be seen as missing value.(NA)
   a.df[a.col_ctr][a.df[a.col_ctr] == 0] <- NA
   a.df[a.col_exp][a.df[a.col_exp] == 0] <- NA
-  
-  
-  
+
+
+
   # Calculate log2FC,
   # can be slightly different (5^-12 units) from limma,
   # but is easier to reproduce.
   a.df[, "log2FC"] <- log2(a.df[, "exp_mean"] / a.df[, "ctr_mean"])
-  
-  
-  
-  # In LFQbenchmark experiments, assign the respective species 
-  # to species-specific entries and remove entries matching 
+
+
+
+  # In LFQbenchmark experiments, assign the respective species
+  # to species-specific entries and remove entries matching
   # multiple species or no species. Should also work on 2-species.
   a.df[, "Species"] <- NA
-  
+
 
   a.df[, "Species"][grepl('_HUMAN', a.df[, "Protein.Names"]) &
                       !grepl('_ECOLI', a.df[, "Protein.Names"]) &
                       !grepl('_YEAST', a.df[, "Protein.Names"]) &
                       !grepl('_CAEEL', a.df[, "Protein.Names"])] <- 'Human'
-  
+
   a.df[, "Species"][grepl('_YEAST', a.df[, "Protein.Names"]) &
                       !grepl('_HUMAN', a.df[, "Protein.Names"]) &
                       !grepl('_ECOLI', a.df[, "Protein.Names"]) &
                       !grepl('_CAEEL', a.df[, "Protein.Names"])] <- 'Yeast'
-  
+
   a.df[, "Species"][grepl('_ECOLI', a.df[, "Protein.Names"]) &
                       !grepl('_HUMAN', a.df[, "Protein.Names"]) &
                       !grepl('_YEAST', a.df[, "Protein.Names"]) &
                       !grepl('_CAEEL', a.df[, "Protein.Names"])] <- 'E.coli'
-  
+
   a.df[, "Species"][grepl('_CAEEL', a.df[, "Protein.Names"]) &
                       !grepl('_HUMAN', a.df[, "Protein.Names"]) &
                       !grepl('_YEAST', a.df[, "Protein.Names"]) &
                       !grepl('_ECOLI', a.df[, "Protein.Names"])] <- 'C.elegans'
-  
+
 
   a.df <- a.df[complete.cases(a.df[, "Species"]), ]
-  
-  
-  
-  
-  
+
+
+
+
+
   # Add column listing expected log2FC row-wise
   # to simplify calculations of summary_stats around the log2FC.
 
     a.df[, "expected_log2FC"] <- NA
-  
+
 
     a.df[a.df[, "Species"]== "Human", "expected_log2FC"]      <- expFC_human
     a.df[a.df[, "Species"]== "Yeast", "expected_log2FC"]      <- expFC_yeast
     a.df[a.df[, "Species"]== "E.coli", "expected_log2FC"]     <- expFC_ecoli
     a.df[a.df[, "Species"]== "C.elegans", "expected_log2FC"]  <- expFC_celegans
-  
-  
+
+
   return(a.df)
-  
+
 }
 
 
 
 
-# Acquire adjusted p-values for differential expression analysis 
+# Acquire adjusted p-values for differential expression analysis
 # for the protein group matrix with limma. Not executed on Precursor level.
 # e.g. Prot3 <- f.limma.p_adj(Prot3, col_ctr_Prot, col_exp_Prot)
 f.limma.p_adj <- function(a.df,
                           a.col_ctr,
                           a.col_exp) {
-  
+
   # Limma to get BH adjusted p-values (p_adj) for differential expression.
   dcontra = matrix(c('exp', 'con'),
                    ncol = 2,
                    dimnames = list(NULL, c('CONDITION', 'CONDITION_REF'))) # defines in each rwo conditions that should be compared
   assay = as.matrix(a.df[, c(a.col_exp, a.col_ctr)]) # features x samples: Protein.Group x exp and con columns
   rownames(assay) = a.df[, 'Protein.Group']
-  
-  
+
+
  ## IF e.g. grps=c('exp','exp','exp','ctr','ctr','ctr')
   ## then for paired analysis use reps=c(1,2,3,1,2,3)
   ## Otherwise "reps" and "limma.rep" lines should be excluded from running.
-  
+
     grps = c(rep('exp', length(a.col_exp)), rep('con', length(a.col_ctr))) # conditions of samples in assay
-  
-  
-  # in case of paired analysis e.g. reps=c(1,2,3,1,2,3) 
+
+
+  # in case of paired analysis e.g. reps=c(1,2,3,1,2,3)
   # reps = c(1:length(a.col_exp), 1:length(a.col_ctr))
-  
-  
+
+
   # Limma expects logarithmized input intensities
   assay = log2(assay)
-  
+
   limma_data = ExpressionSet(assay
                              ,
                              phenoData = AnnotatedDataFrame(data.frame(
@@ -725,7 +726,7 @@ f.limma.p_adj <- function(a.df,
   comparisons <-
     c('exp - con') # Conditions that should be compared, in the trivial case it's exp vs con
   limma.cond = factor(grps)
-  
+
   ## in case of paired analysis enable limma.rep
   #limma.rep <- factor(reps)
   contrast.matrix <- model.matrix(~  0 + limma.cond
@@ -733,7 +734,7 @@ f.limma.p_adj <- function(a.df,
                                   )
   colnames(contrast.matrix) <-
     gsub("limma.cond", "", colnames(contrast.matrix))
-  
+
   limma.object <- eBayes(contrasts.fit(
     lmFit(limma_data, design = contrast.matrix)
     ,
@@ -750,16 +751,16 @@ f.limma.p_adj <- function(a.df,
     adjust.method = "BH",
     confint = TRUE
   )
-  
-  
+
+
   # Add p_adj (limma result) to the main protein group data frame.
   a.df[, "p_adj"] <- res_limma[, 'adj.P.Val']
   a.df[, "p_adj"] <- as.numeric(format(a.df[, "p_adj"],
                                        scientific = FALSE,
                                        justified = "none"))
   return(a.df)
-  
-  
+
+
   # # For use outside of a function,
   # # clean up environment from unused limma elements.
   # rm(assay)
@@ -785,71 +786,71 @@ f.limma.p_adj <- function(a.df,
 # e.g. Prot3 <- f.LFQbenchmark.limma.interpretation(Prot3, alpha_limma, limit_FC)
 f.LFQbenchmark.limma.interpretation <-
   function(a.df, a.alpha_limma, a.limit_FC) {
-    
+
     a.df[(a.df[, "Species"] == "Human"
           & (a.df[, "p_adj"] >= a.alpha_limma
              | abs(a.df[, "log2FC"]) <= a.limit_FC)), "DE_result"] <-
       "true negative"
-    
+
     a.df[(a.df[, "Species"] == "Human"
           & a.df[, "p_adj"] < a.alpha_limma
           & abs(a.df[, "log2FC"]) > a.limit_FC), "DE_result"] <-
       "false positive"
-    
-    
-    
+
+
+
     a.df[(a.df[, "Species"] == "Yeast"
           & a.df[, "log2FC"] > +a.limit_FC
           & a.df[, "p_adj"] < a.alpha_limma), "DE_result"] <-
       "true positive"
-    
+
     a.df[(a.df[, "Species"] == "Yeast"
           & a.df[, "log2FC"] < -a.limit_FC
           & a.df[, "p_adj"] < a.alpha_limma), "DE_result"] <-
       "false positive"
-    
+
     a.df[(a.df[, "Species"] == "Yeast"
           & (a.df[, "p_adj"] >= a.alpha_limma
              | abs(a.df[, "log2FC"]) <= a.limit_FC)), "DE_result"] <-
       "false negative"
-    
-    
-    
+
+
+
     a.df[(a.df[, "Species"] == "E.coli"
           & a.df[, "log2FC"] < -a.limit_FC
           & a.df[, "p_adj"] < a.alpha_limma), "DE_result"] <-
       "true positive"
-    
+
     a.df[(a.df[, "Species"] == "E.coli"
           & a.df[, "log2FC"] > +a.limit_FC
           & a.df[, "p_adj"] < a.alpha_limma), "DE_result"] <-
       "false positive"
-    
+
     a.df[(a.df[, "Species"] == "E.coli"
           & (a.df[, "p_adj"] >= a.alpha_limma
              | abs(a.df[, "log2FC"]) <= a.limit_FC)), "DE_result"] <-
       "false negative"
-    
-    
-    
+
+
+
     a.df[(a.df[, "Species"] == "C.elegans"
           & a.df[, "log2FC"] < -a.limit_FC
           & a.df[, "p_adj"] < a.alpha_limma), "DE_result"] <-
       "true positive"
-    
+
     a.df[(a.df[, "Species"] == "C.elegans"
           & a.df[, "log2FC"] > +a.limit_FC
           & a.df[, "p_adj"] < a.alpha_limma), "DE_result"] <-
       "false positive"
-    
+
     a.df[(a.df[, "Species"] == "C.elegans"
           & (a.df[, "p_adj"] >= a.alpha_limma
              | abs(a.df[, "log2FC"]) <= a.limit_FC)), "DE_result"] <-
       "false negative"
-    
-    
+
+
     return(a.df)
-    
+
   }
 
 
@@ -861,86 +862,86 @@ f.LFQbenchmark.limma.interpretation <-
 # E.g. f.asym.down-regulated(Prot3, "E.coli")
 f.asym.downregulated <- function(a.df,
                                  a.species) {
-  
+
   # if statement required to prevent errors when handling 2-species benchmarks.
   if(length(a.df[a.df[, "Species"] == a.species, "log2FC"]) > 2) {
-    
+
     # 1-dimensional data like log2 fold-changes
     # to data frames containing x and y coordinates of density plot function
     data <- a.df[a.df[, "Species"] == a.species, "log2FC"]
     density <- density(data)
     density <- as.data.frame(cbind(density$x, density$y))
     colnames(density) <- c("x", "y")
-    
+
     # ymax and respective x coordinate called C
     ymax <- density$y[which.max(density$y)]
     C <- density$x[which.max(density$y)]
-    
+
     # subset density coordinates by lefthand and righthand of modal
     # to differentiate multiple x coordinates matching one y coordinate.
-    density_left <- density[density$x < C,] 
-    density_right <- density[density$x > C,] 
-    
+    density_left <- density[density$x < C,]
+    density_right <- density[density$x > C,]
+
     # A and B are the index, x, and y coordinates at a given height relative to ymax.
     A1 <- density_left[which.min(abs(density_left$y - ymax*0.10)),]
     B1 <- density_right[which.min(abs(density_right$y - ymax*0.10)),]
-    
+
     A2 <- density_left[which.min(abs(density_left$y - ymax*0.05)),]
     B2 <- density_right[which.min(abs(density_right$y - ymax*0.05)),]
-    
+
     # Factors calculated directional towards the outside away from log2FC of 0.
     Asymmetry_Factor <- (A1$x - C) / (C - B1$x)
     Tailing_Factor <- (A2$x - B2$x) / (2* (C - B2$x))
-    
+
     return(cbind(Tailing_Factor, Asymmetry_Factor))
-    
+
   } else {
-    
+
     return(cbind(NA, NA))}
-  
+
 }
 
 # Asymmetry and tailing calculated for up-regulated log2 fold-changes.
 # # E.g. f.asym.up-regulated(Prot3, "Yeast")
 f.asym.upregulated <- function(a.df,
                                a.species) {
-  
+
   # if statement required to prevent errors when handling 2-species benchmarks.
   if(length(a.df[a.df[, "Species"] == a.species, "log2FC"]) > 2) {
-    
+
     # 1-dimensional data like log2 fold-changes
     # to data frames containing x and y coordinates of density plot function
     data <- a.df[a.df[, "Species"] == a.species, "log2FC"]
     density <- density(data)
     density <- as.data.frame(cbind(density$x, density$y))
     colnames(density) <- c("x", "y")
-    
+
     # ymax and respective x coordinate called C
     ymax <- density$y[which.max(density$y)]
     C <- density$x[which.max(density$y)]
-    
+
     # subset density coordinates by leftside and rightside of modal
     # to differentiate x coordinates matchign one y coordiante
-    density_left <- density[density$x < C,] 
-    density_right <- density[density$x > C,] 
-    
+    density_left <- density[density$x < C,]
+    density_right <- density[density$x > C,]
+
     # A and B are the index, x, and y coordinates at a given height relative to ymax.
     A1 <- density_left[which.min(abs(density_left$y - ymax*0.10)),]
     B1 <- density_right[which.min(abs(density_right$y - ymax*0.10)),]
-    
+
     A2 <- density_left[which.min(abs(density_left$y - ymax*0.05)),]
     B2 <- density_right[which.min(abs(density_right$y - ymax*0.05)),]
-    
+
     # Factors calculated directional towards the outside away from log2FC of 0.
     Asymmetry_Factor <- (B1$x - C) / (C - A1$x)
     Tailing_Factor <- (B2$x - A2$x) / (2* (C - A2$x))
-    
+
     return(cbind(Tailing_Factor, Asymmetry_Factor))
-    
+
   } else {
-    
+
     return(cbind(NA, NA))}
-  
+
 }
 
 
@@ -955,8 +956,8 @@ f.asym.upregulated <- function(a.df,
 f.LFQbenchmark.summary.stats <-
   function(a.df01, a.df02, a.df03, a.df04) {
     summary_stats <- data.frame(matrix(ncol = 0, nrow = 1))
-    
-    
+
+
     # R script filter variables to avoid confusion
     # when collecting stats of multiple benchmarks in excel.
     summary_stats[, "Variables"] <-
@@ -965,8 +966,8 @@ f.LFQbenchmark.summary.stats <-
              limit_CV,",",
              limit_FC,",",
              alpha_limma)
-    
-    
+
+
     # deFDR (differential expression FDR) (part of confusion matrix)
     summary_stats[, "deFDR"] <-
       round(digits = 2,
@@ -977,35 +978,35 @@ f.LFQbenchmark.summary.stats <-
               + length(which(
                 a.df02[, "DE_result"] == "true positive"
               ))))
-    
-    
+
+
     # true positive count
     summary_stats[, "TP"] <-
       length(which(a.df02[, "DE_result"] == "true positive"))
-    
-    
+
+
     # Number of confidently detected and quantified protein groups,
     # after filtering for missingness and missingness + CV.
     summary_stats[, "Prot_ID"] <- nrow(a.df01)
     summary_stats[, "Prot_Quant"] <- nrow(a.df02)
-    
-    
+
+
     # Asymmetry_Factor to evaluate ratio compression or extension.
-    summary_stats[, "Prot_Asymmetry_E.coli"] <- 
+    summary_stats[, "Prot_Asymmetry_E.coli"] <-
       round( digits =2,
-             as.numeric(subset(asymmetry, 
+             as.numeric(subset(asymmetry,
                                Species == "E.coli" &
                                  Group == "protein group",
                                select = "Asymmetry_Factor")))
-    
-    summary_stats[, "Prot_Asymmetry_Yeast"] <- 
+
+    summary_stats[, "Prot_Asymmetry_Yeast"] <-
       round( digits =2,
-             as.numeric(subset(asymmetry, 
+             as.numeric(subset(asymmetry,
                                Species == "Yeast" &
                                  Group == "protein group",
                                select = "Asymmetry_Factor")))
-    
-    
+
+
     # Coefficient of variation to describe precision.
     # For ca. 3 replicates aim at average and median at or below 5%
     # after filtering for <20%.
@@ -1013,15 +1014,15 @@ f.LFQbenchmark.summary.stats <-
       round(digits = 2,  mean(c(a.df02[, "ctr_CV"], a.df02[, "exp_CV"])))
     summary_stats[, "Prot_CV_Median"] <-
       round(digits = 2, median(c(a.df02[, "ctr_CV"], a.df02[, "exp_CV"])))
-    
-    
+
+
     # Accuracy is average distance of measured to expected log2FC.
     summary_stats[, "Prot_Accuracy"] <-
       round(digits = 2,
             mean(abs(a.df02[, "log2FC"] - a.df02[, "expected_log2FC"])))
-    
-    
-    # Trueness is distance between measurement medians 
+
+
+    # Trueness is distance between measurement medians
     # and respective expected fold-changes.
     # (cumulative as shifts are important to spot)
     # Several conditions can lead to a high value
@@ -1035,8 +1036,8 @@ f.LFQbenchmark.summary.stats <-
               abs(median(a.df02[a.df02[, "Species"] == "E.coli" , "log2FC"]) - expFC_ecoli),
               abs(median(a.df02[a.df02[, "Species"] == "C.elegans"  , "log2FC"]) - expFC_celegans)
               )))
-    
-    
+
+
     # Dispersion is the average distance of individual measurements around the respective median.
     summary_stats[, "Prot_Dispersion"] <-
       round(digits = 2,
@@ -1047,9 +1048,9 @@ f.LFQbenchmark.summary.stats <-
                    abs(a.df02[a.df02[, "Species"] == "E.coli"  , "log2FC"] - median(a.df02[a.df02[, "Species"] == "E.coli" , "log2FC"])),
                    abs(a.df02[a.df02[, "Species"] == "C.elegans"  , "log2FC"] - median(a.df02[a.df02[, "Species"] == "C.elegans" , "log2FC"]))
                  )))
-    
-    
-    # Other than TP, continued confusion matrix of 
+
+
+    # Other than TP, continued confusion matrix of
     # differential expression result interpretation.
     summary_stats[, "FP"] <-
       length(which(a.df02[, "DE_result"] == "false positive"))
@@ -1057,8 +1058,8 @@ f.LFQbenchmark.summary.stats <-
       length(which(a.df02[, "DE_result"] == "true negative"))
     summary_stats[, "FN"] <-
       length(which(a.df02[, "DE_result"] == "false negative"))
-    
-    
+
+
     summary_stats[, "Sensitivity"] <-
       round(digits = 2, 100 * length(which(a.df02[, "DE_result"] == "true positive")) /
               (length(which(
@@ -1066,7 +1067,7 @@ f.LFQbenchmark.summary.stats <-
               )) + length(which(
                 a.df02[, "DE_result"] == "false negative"
               ))))
-    
+
     summary_stats[, "Specificity"] <-
       round(digits = 2, 100 * length(which(a.df02[, "DE_result"] == "true negative")) /
               (length(which(
@@ -1074,48 +1075,48 @@ f.LFQbenchmark.summary.stats <-
               )) + length(which(
                 a.df02[, "DE_result"] == "false positive"
               ))))
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
     # Stats partially repeated on precursor level as for protein groups above.
     summary_stats[, "Prec_ID"] <- nrow(a.df03)
     summary_stats[, "Prec_Quant"] <- nrow(a.df04)
-    
-    
+
+
     # Asymmetry_Factor to evaluate ratio compression or extension.
-    summary_stats[, "Prec_Asymmetry_E.coli"] <- 
+    summary_stats[, "Prec_Asymmetry_E.coli"] <-
       round( digits =2,
-             as.numeric(subset(asymmetry, 
+             as.numeric(subset(asymmetry,
                                Species == "E.coli" &
                                  Group == "precursor",
                                select = "Asymmetry_Factor")))
-    
-    summary_stats[, "Prec_Asymmetry_Yeast"] <- 
+
+    summary_stats[, "Prec_Asymmetry_Yeast"] <-
       round( digits =2,
-             as.numeric(subset(asymmetry, 
+             as.numeric(subset(asymmetry,
                                Species == "Yeast" &
                                  Group == "precursor",
                                select = "Asymmetry_Factor")))
-    
-    
-    
+
+
+
     # Precursor-level precision by coefficient of variation.
     summary_stats[, "Prec_CV_Mean"]   <-  round(digits = 2,
                                                 mean(c(a.df04[, "ctr_CV"], a.df04[, "exp_CV"])))
     summary_stats[, "Prec_CV_Median"] <-  round(digits = 2,
                                                 median(c(a.df04[, "ctr_CV"], a.df04[, "exp_CV"])))
-    
-    
+
+
     # Accuracy is average distance of measured to expected log2FC.
     summary_stats[, "Prec_Accuracy"] <-
       round(digits = 2,
             mean(abs(a.df04[, "log2FC"] - a.df04[, "expected_log2FC"])))
-    
-    
-    # Trueness is distance between measurement medians 
+
+
+    # Trueness is distance between measurement medians
     # and respective expected fold-changes (cumulative as shifts are important to spot)
     summary_stats[, "Prec_Trueness"] <-
       round(
@@ -1126,8 +1127,8 @@ f.LFQbenchmark.summary.stats <-
               abs(median(a.df04[a.df04[, "Species"] == "E.coli"  , "log2FC"]) - expFC_ecoli),
               abs(median(a.df04[a.df04[, "Species"] == "C.elegans"  , "log2FC"]) - expFC_celegans)
               )))
-    
-    
+
+
     # Dispersion is the average distance of individual measurements around the respective median.
     summary_stats[, "Prec_Dispersion"] <-
       round(digits = 2,
@@ -1138,17 +1139,17 @@ f.LFQbenchmark.summary.stats <-
                    abs(a.df04[a.df04[, "Species"] == "E.coli"  , "log2FC"] - median(a.df04[a.df04[, "Species"] == "E.coli"  , "log2FC"])),
                    abs(a.df04[a.df04[, "Species"] == "C.elegans"  , "log2FC"] - median(a.df04[a.df04[, "Species"] == "C.elegans"  , "log2FC"]))
                  )))
-    
-    
-    
+
+
+
     # Folder that contained the analysed pg and pc matrix
     summary_stats[, "folder_input"] <- folder_input
-    
-    
-    
-    
+
+
+
+
     return(summary_stats)
-    
+
   }
 
 
@@ -1164,7 +1165,7 @@ Prec0 <- f.import.matrix(folder_input, "pr_matrix", "\t")
 
 
 
-# Perform basic sanitation and calculations as preparation, 
+# Perform basic sanitation and calculations as preparation,
 # but no quantification-related filtering.
 Prot1 <- Prot0
 Prot1 %<>%
@@ -1198,7 +1199,7 @@ Prot3 %<>%
 # Repeat data processing except for differential expression
 # analysis on the precursor level.
 
-# Perform basic sanitation and calculations as preparation, 
+# Perform basic sanitation and calculations as preparation,
 # but no quantification-related filtering.
 Prec1 <- Prec0
 Prec1 %<>%
@@ -1233,11 +1234,11 @@ Prec3 <- subset(Prec2, ctr_CV <  limit_CV & exp_CV <  limit_CV)
 # to investigate fold-change over-or underestimation.
 # Quantiles will be attached below, but the asymmetry factor remains
 # the easiest to interpret and the most important of these summary stats.
-# Asymmetry Factor of 0.5 or below indicates a strong fold-change underestimation, 
+# Asymmetry Factor of 0.5 or below indicates a strong fold-change underestimation,
 # a value above 2 indicates a strong fold-change overestimation.
 
 asymmetry <- data.frame(matrix(ncol = 0, nrow = 8))
-asymmetry[, "Group"] <- c(rep("precursor", 4), 
+asymmetry[, "Group"] <- c(rep("precursor", 4),
                           rep("protein group", 4))
 asymmetry[, "Species"] <- c("E.coli", "Human", "Yeast", "C.elegans")
 
@@ -1294,7 +1295,7 @@ quantiles_Prot <- Prot3 %>%
 quantiles_Prot[,"Group"] <- "protein group"
 quantiles_Prot[,"|Q2-Q1|"] <- abs(quantiles_Prot[,"Q2"] - quantiles_Prot[,"Q1"])
 quantiles_Prot[,"|Q2-Q3|"] <- abs(quantiles_Prot[,"Q2"] - quantiles_Prot[,"Q3"])
-quantiles_Prot[,"|Q2-Q1| / |Q2-Q3|"] <- quantiles_Prot[,"|Q2-Q1|"] / quantiles_Prot[,"|Q2-Q3|"] 
+quantiles_Prot[,"|Q2-Q1| / |Q2-Q3|"] <- quantiles_Prot[,"|Q2-Q1|"] / quantiles_Prot[,"|Q2-Q3|"]
 quantiles_Prot[,"|Q2-Q3| / |Q2-Q1|"] <- quantiles_Prot[,"|Q2-Q3|"] / quantiles_Prot[,"|Q2-Q1|"]
 
 
@@ -1308,7 +1309,7 @@ quantiles_Prec <- Prec3 %>%
 quantiles_Prec[,"Group"] <- "precursor"
 quantiles_Prec[,"|Q2-Q1|"] <- abs(quantiles_Prec[,"Q2"] - quantiles_Prec[,"Q1"])
 quantiles_Prec[,"|Q2-Q3|"] <- abs(quantiles_Prec[,"Q2"] - quantiles_Prec[,"Q3"])
-quantiles_Prec[,"|Q2-Q1| / |Q2-Q3|"] <- quantiles_Prec[,"|Q2-Q1|"] / quantiles_Prec[,"|Q2-Q3|"] 
+quantiles_Prec[,"|Q2-Q1| / |Q2-Q3|"] <- quantiles_Prec[,"|Q2-Q1|"] / quantiles_Prec[,"|Q2-Q3|"]
 quantiles_Prec[,"|Q2-Q3| / |Q2-Q1|"] <- quantiles_Prec[,"|Q2-Q3|"] / quantiles_Prec[,"|Q2-Q1|"]
 
 
@@ -1407,7 +1408,7 @@ subtitle_Prot <- paste0(
     "Disp ",
     summary_stats[, "Prec_Dispersion"],
     "\n ")
-  
+
 
 # Different captions for precursor and protein group plots.
 caption_Prot <- paste0(rep_min, "of", rep_max,
@@ -1466,7 +1467,7 @@ f.p.pca <- function(a.df,
                     a.subtitle,
                     a.caption) {
 
-  
+
 # Replicate-level pca calculations
 pca <- prcomp(t(na.omit(a.df[,c(a.col_ctr, a.col_exp)])), scale = TRUE)
 
@@ -1483,27 +1484,27 @@ ggplot(pca_df,
          x = x,
          y = y,
          label = Replicate)) +
-  
+
   coord_cartesian(
     xlim = c(2.5*min(pca_df[,"x"]),2.5*max(pca_df[,"x"])),
     ylim = c(2.5*min(pca_df[,"y"]),2.5*max(pca_df[,"y"])))+
-  
+
   geom_point(size = 2.5, alpha = 0.5) +
-  
-  geom_text(size = 2.0, 
+
+  geom_text(size = 2.0,
             vjust= 1.9)+
-  
+
   labs(subtitle = a.subtitle,
        caption = a.caption)+
-  
+
        xlab(paste0("PC1 - ", pca_var[1],"%")) +
        ylab(paste0("PC2 - ", pca_var[2],"%")) +
-  
+
 
   theme(
     panel.background  = element_blank(),
     plot.background = element_rect(fill = "white", color = "white"),
-    
+
     plot.title = element_text(
       hjust = 0.5,
       face = "bold",
@@ -1512,7 +1513,7 @@ ggplot(pca_df,
       angle = 0,
       margin = margin(0, 0, 0.0, 0)
     ),
-    
+
     plot.subtitle = element_text(
       hjust = 0.5,
       face = "plain",
@@ -1521,7 +1522,7 @@ ggplot(pca_df,
       angle = 0,
       margin = margin(0, 0, 1, 0)
     ),
-    
+
     plot.caption = element_text(
       hjust = -0.1,
       face = "italic",
@@ -1530,7 +1531,7 @@ ggplot(pca_df,
       angle = 0,
       margin = margin(5, 0,-4, 0)
     ),
-    
+
     axis.text.x = element_text(
       face = "plain",
       color = 'black',
@@ -1538,7 +1539,7 @@ ggplot(pca_df,
       angle = 0,
       margin = margin(2, 0, 0, 0)
     ),
-    
+
     axis.text.y = element_text(
       face = "plain",
       color = 'black',
@@ -1546,7 +1547,7 @@ ggplot(pca_df,
       angle = 0,
       margin = margin(0, 2, 0, 0)
     ),
-    
+
     axis.title.y = element_text(
       face = "plain",
       color = 'black',
@@ -1554,22 +1555,22 @@ ggplot(pca_df,
       angle = 90,
       margin = margin(0, 4, 0, 0)
     ),
-    
+
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
-    
+
     axis.line = element_line(
       size = 0.3,
       linetype = "solid",
       color = "black"
     ),
-    
+
     axis.ticks = element_line(
       size = 0.3,
       linetype = "solid",
       color = "black"
     ),
-    
+
     axis.title.x = element_text(
       hjust = 0.5,
       face = "plain",
@@ -1578,7 +1579,7 @@ ggplot(pca_df,
       angle = 0,
       margin = margin(4, 0, 0, 0)
     ),
-    
+
     # legend.title = element_blank(),
     # legend.background = element_rect(fill = "transparent",
     #                                  color = NA, size = 0.1),
@@ -1595,7 +1596,7 @@ ggplot(pca_df,
     #                            size = 9, angle = 0,
     #                            margin = margin(0, 0, 0, 0))
   ) +
-  
+
   guides(colour = guide_legend(override.aes = list(alpha = 1)))
 
 }
@@ -1637,7 +1638,7 @@ f.p.CV <- function(a.df,
   aes(x = Species,
       y = CV,
       fill = Species)) +
-    
+
     geom_violin(
       trim = TRUE,
       scale = "area",
@@ -1646,7 +1647,7 @@ f.p.CV <- function(a.df,
       alpha = 0.6,
       draw_quantiles = c(0.5)
     ) +
-    
+
     stat_summary(
       fun = mean,
       geom = "point",
@@ -1654,28 +1655,28 @@ f.p.CV <- function(a.df,
       color = "black",
       show.legend = FALSE
     ) +
-    
+
     labs(subtitle = a.subtitle,
          caption = a.caption) +
-    
+
     scale_fill_manual(values = c(color_human, color_yeast, color_ecoli, color_celegans)) +
-    
+
     coord_cartesian(ylim = c(0, 30)) +
     scale_y_continuous(
       name = "CV in %",
       breaks = c(0, 5, 10, 15, 20, 25, 30),
       expand = expansion(mult = c(.00, .00))
     ) +
-    
+
     theme_gray(base_size = 11) +
     theme(
       panel.background = element_blank(),
       panel.grid.major = element_blank(),
       panel.grid.minor = element_blank(),
-      
+
       plot.background = element_rect(fill = "white",
                                      color = "white"),
-      
+
       plot.title = element_text(
         hjust = 0.5,
         face = "bold",
@@ -1684,7 +1685,7 @@ f.p.CV <- function(a.df,
         angle = 0,
         margin = margin(0, 0, 0.0, 0)
       ),
-      
+
       plot.subtitle = element_text(
         hjust = 0.5,
         face = "plain",
@@ -1693,7 +1694,7 @@ f.p.CV <- function(a.df,
         angle = 0,
         margin = margin(0, 0, 1, 0)
       ),
-      
+
       plot.caption = element_text(
         hjust = -0.1,
         face = "italic",
@@ -1702,7 +1703,7 @@ f.p.CV <- function(a.df,
         angle = 0,
         margin = margin(5, 0,-4, 0)
       ),
-      
+
       axis.text.x = element_text(
         face = "plain",
         color = 'black',
@@ -1710,7 +1711,7 @@ f.p.CV <- function(a.df,
         angle = 0,
         margin = margin(2, 0, 0, 0)
       ),
-      
+
       axis.text.y = element_text(
         face = "plain",
         color = 'black',
@@ -1718,7 +1719,7 @@ f.p.CV <- function(a.df,
         angle = 0,
         margin = margin(0, 2, 0, 0)
       ),
-      
+
       axis.title.x = element_text(
         hjust = 0.5,
         face = "plain",
@@ -1727,7 +1728,7 @@ f.p.CV <- function(a.df,
         angle = 0,
         margin = margin(4, 0, 0, 0)
       ),
-      
+
       axis.title.y = element_text(
         face = "plain",
         color = 'black',
@@ -1735,20 +1736,20 @@ f.p.CV <- function(a.df,
         angle = 90,
         margin = margin(0, 4, 0, 0)
       ),
-      
+
       axis.line = element_line(
         size = 0.3,
         linetype = "solid",
         color = "black"
       ),
-      
+
       axis.ticks = element_line(
         size = 0.3,
         linetype = "solid",
         color = "black"
       ),
-      
-      
+
+
       legend.background = element_rect(
         fill = "transparent",
         color = NA,
@@ -1796,7 +1797,7 @@ f.p.density <- function(a.df,
   ggplot(a.df,
          aes(x = log2FC,
              fill = factor(Species))) +
-    
+
     # Values outside FC_min and FC_max are ignored,
     # to avoid coord_cartesian bug resulting in loss of plot color.
     scale_x_continuous(
@@ -1805,43 +1806,43 @@ f.p.density <- function(a.df,
       expand = expansion(mult = c(.02, .00)),
       limits = c(FC_min, FC_max)
     ) +
-    
+
     scale_y_continuous(
       name = "density",
       breaks = seq(from = 0, to = 7, by = 1 ),
       expand = expansion(mult = c(.00, .02)),
       limits = c(0, 7)
     ) +
-    
-    
+
+
     geom_vline(
       xintercept = median(a.df[a.df[, "Species"] == "Human", "log2FC"]),
       linetype = "dashed",
       color = color_human,
       alpha = 0.9
     ) +
-    
+
     geom_vline(
       xintercept = median(a.df[a.df[, "Species"] == "Yeast", "log2FC"]),
       linetype = "dashed",
       color = color_yeast,
       alpha = 0.9
     ) +
-    
+
     geom_vline(
       xintercept = median(a.df[a.df[, "Species"] == "E.coli", "log2FC"]),
       linetype = "dashed",
       color = color_ecoli,
       alpha = 0.9
     ) +
-    
+
     geom_vline(
       xintercept = median(a.df[a.df[, "Species"] == "C.elegans", "log2FC"]),
       linetype = "dashed",
       color = color_celegans,
       alpha = 0.9
     ) +
-    
+
 
     geom_density(
       data = a.df[a.df[, "Species"] == "Human", ],
@@ -1850,7 +1851,7 @@ f.p.density <- function(a.df,
       # key_glyph =  draw_key_rect,
       fill = color_human,
     ) +
-    
+
     geom_density(
       data = a.df[a.df[, "Species"] == "Yeast", ],
       size = 0.6,
@@ -1858,7 +1859,7 @@ f.p.density <- function(a.df,
       # key_glyph =  draw_key_rect,
       fill = color_yeast
       ) +
-    
+
     geom_density(
       data = a.df[a.df[, "Species"] == "E.coli", ],
       size = 0.6,
@@ -1866,7 +1867,7 @@ f.p.density <- function(a.df,
       # key_glyph =  draw_key_rect,
       fill = color_ecoli
     ) +
-    
+
     geom_density(
       data = a.df[a.df[, "Species"] == "C.elegans", ],
       size = 0.6,
@@ -1874,18 +1875,18 @@ f.p.density <- function(a.df,
       # key_glyph =  draw_key_rect,
       fill = color_celegans
     ) +
-    
 
-    
-    
-    labs(subtitle = a.subtitle, 
+
+
+
+    labs(subtitle = a.subtitle,
          caption = a.caption) +
 
- 
+
     theme(
       panel.background  = element_blank(),
       plot.background = element_rect(fill = "white", color = "white"),
-      
+
       plot.title = element_text(
         hjust = 0.5,
         face = "bold",
@@ -1894,7 +1895,7 @@ f.p.density <- function(a.df,
         angle = 0,
         margin = margin(0, 0, 0.0, 0)
       ),
-      
+
       plot.subtitle = element_text(
         hjust = 0.5,
         face = "plain",
@@ -1903,7 +1904,7 @@ f.p.density <- function(a.df,
         angle = 0,
         margin = margin(0, 0, 1, 0)
       ),
-      
+
       plot.caption = element_text(
         hjust = -0.1,
         face = "italic",
@@ -1912,7 +1913,7 @@ f.p.density <- function(a.df,
         angle = 0,
         margin = margin(5, 0,-4, 0)
       ),
-      
+
       axis.text.x = element_text(
         face = "plain",
         color = 'black',
@@ -1920,7 +1921,7 @@ f.p.density <- function(a.df,
         angle = 0,
         margin = margin(2, 0, 0, 0)
       ),
-      
+
       axis.text.y = element_text(
         face = "plain",
         color = 'black',
@@ -1928,7 +1929,7 @@ f.p.density <- function(a.df,
         angle = 0,
         margin = margin(0, 2, 0, 0)
       ),
-      
+
       axis.title.y = element_text(
         face = "plain",
         color = 'black',
@@ -1936,22 +1937,22 @@ f.p.density <- function(a.df,
         angle = 90,
         margin = margin(0, 4, 0, 0)
       ),
-      
+
       panel.grid.major = element_blank(),
       panel.grid.minor = element_blank(),
-      
+
       axis.line = element_line(
         size = 0.3,
         linetype = "solid",
         color = "black"
       ),
-      
+
       axis.ticks = element_line(
         size = 0.3,
         linetype = "solid",
         color = "black"
       ),
-      
+
       axis.title.x = element_text(
         hjust = 0.5,
         face = "plain",
@@ -1960,14 +1961,14 @@ f.p.density <- function(a.df,
         angle = 0,
         margin = margin(4, 0, 0, 0)
       ),
-      
-      
+
+
       legend.title = element_blank(),
       legend.background = element_rect(
         fill = "white",
         color = "white",
         size = 0.1),
-      
+
       legend.key = element_rect(fill = "white", color = "white"),
       legend.key.height = unit(0, "cm"),
       legend.margin = margin(3, 0, 0, 0),
@@ -1982,15 +1983,15 @@ f.p.density <- function(a.df,
         size = 9,
         angle = 0,
         margin = margin(0, 0, 0, 0))
- 
-      
+
+
     ) +
-    
+
     guides(colour = guide_legend(override.aes = list(color = "white")))
-      
-      
-      
-    
+
+
+
+
 }
 
 
@@ -2021,23 +2022,23 @@ f.p.box_simple <- function(a.df) {
          aes(x = Species,
              y = log2FC,
              fill = Species)) +
-    
+
     scale_fill_manual(values = c(color_human, color_yeast, color_ecoli, color_celegans)) +
-    
+
     labs(subtitle = "", caption = "") +
-    
+
     coord_cartesian(ylim = c(FC_min, FC_max)) +
     scale_y_continuous(
       name = "",
       breaks = seq(from = round(digits = 0, FC_min), to = round(digits = 0, FC_max), by = 1 ),
       expand = expansion(mult = c(.02, .02))
     ) +
-    
+
     theme(legend.position = "none") +
     theme_void() +
     theme(strip.text.x = element_blank()) +
     theme(text = element_text(color = "black")) +
-    
+
     geom_boxplot(
       key_glyph = "blank",
       outlier.colour = "grey50",
@@ -2071,45 +2072,45 @@ f.p.scatter <- function(a.df,
            color = Species,
            fill = Species
          )) +
-    
+
     geom_hline(
       yintercept = median(a.df[a.df[, "Species"] == "Human", "log2FC"]),
       linetype = "dashed",
       color = color_human,
       alpha = 0.9
     ) +
-    
+
     geom_hline(
       yintercept = median(a.df[a.df[, "Species"] == "Yeast", "log2FC"]),
       linetype = "dashed",
       color = color_yeast,
       alpha = 0.9
     ) +
-    
+
     geom_hline(
       yintercept = median(a.df[a.df[, "Species"] == "E.coli", "log2FC"]),
       linetype = "dashed",
       color = color_ecoli,
       alpha = 0.9
     ) +
-    
+
     geom_hline(
       yintercept = median(a.df[a.df[, "Species"] == "C.elegans", "log2FC"]),
       linetype = "dashed",
       color = color_celegans,
       alpha = 0.9
     ) +
-    
+
     geom_point(shape = 16,
                size = 1.2,
                alpha = 0.20) +
-    
+
     scale_color_manual(values = c(color_human, color_yeast, color_ecoli, color_celegans)) +
     scale_fill_manual(values = c(color_human, color_yeast, color_ecoli, color_celegans)) +
-    
+
     labs(subtitle = a.subtitle,
          caption = a.caption) +
-    
+
     coord_cartesian(ylim = c(FC_min, FC_max)) +
     scale_y_continuous(
       name = "log2(A:B)",
@@ -2118,11 +2119,11 @@ f.p.scatter <- function(a.df,
     ) +
     scale_x_continuous(name = "log2(B)",
                        breaks= pretty_breaks()) +
-    
+
     theme(
       panel.background  = element_blank(),
       plot.background = element_rect(fill = "white", color = "white"),
-      
+
       plot.title = element_text(
         hjust = 0.5,
         face = "bold",
@@ -2131,7 +2132,7 @@ f.p.scatter <- function(a.df,
         angle = 0,
         margin = margin(0, 0, 0.0, 0)
       ),
-      
+
       plot.subtitle = element_text(
         hjust = 0.5,
         face = "plain",
@@ -2140,7 +2141,7 @@ f.p.scatter <- function(a.df,
         angle = 0,
         margin = margin(0, 0, 1, 0)
       ),
-      
+
       plot.caption = element_text(
         hjust = -0.1,
         face = "italic",
@@ -2149,7 +2150,7 @@ f.p.scatter <- function(a.df,
         angle = 0,
         margin = margin(5, 0,-4, 0)
       ),
-      
+
       axis.text.x = element_text(
         face = "plain",
         color = 'black',
@@ -2157,7 +2158,7 @@ f.p.scatter <- function(a.df,
         angle = 0,
         margin = margin(2, 0, 0, 0)
       ),
-      
+
       axis.text.y = element_text(
         face = "plain",
         color = 'black',
@@ -2165,7 +2166,7 @@ f.p.scatter <- function(a.df,
         angle = 0,
         margin = margin(0, 2, 0, 0)
       ),
-      
+
       axis.title.y = element_text(
         face = "plain",
         color = 'black',
@@ -2173,22 +2174,22 @@ f.p.scatter <- function(a.df,
         angle = 90,
         margin = margin(0, 4, 0, 0)
       ),
-      
+
       panel.grid.major = element_blank(),
       panel.grid.minor = element_blank(),
-      
+
       axis.line = element_line(
         size = 0.3,
         linetype = "solid",
         color = "black"
       ),
-      
+
       axis.ticks = element_line(
         size = 0.3,
         linetype = "solid",
         color = "black"
       ),
-      
+
       axis.title.x = element_text(
         hjust = 0.5,
         face = "plain",
@@ -2197,14 +2198,14 @@ f.p.scatter <- function(a.df,
         angle = 0,
         margin = margin(4, 0, 0, 0)
       ),
-      
+
       legend.title = element_blank(),
       legend.background = element_rect(
         fill = "transparent",
         color = NA,
         size = 0.1
       ),
-      
+
       legend.key = element_rect(fill = "transparent", color = NA),
       legend.key.height = unit(0, "cm"),
       legend.margin = margin(3, 0, 0, 0),
@@ -2221,7 +2222,7 @@ f.p.scatter <- function(a.df,
         margin = margin(0, 0, 0, 0)
       )
     ) +
-    
+
     guides(colour = guide_legend(override.aes = list(alpha = 1)))
 }
 
@@ -2277,7 +2278,7 @@ f.p.facet <- function(a.df,
            color = Species,
            fill = Species
          )) +
-    
+
     geom_hline(
       yintercept = median(a.df[a.df[, "Species"] == "E.coli", "log2FC"]),
       linetype = "dashed",
@@ -2298,28 +2299,28 @@ f.p.facet <- function(a.df,
       color = color_yeast,
       alpha = 0.7
     ) +
-    
+
     geom_hline(
       yintercept = median(a.df[a.df[, "Species"] == "C.elegans", "log2FC"]),
       linetype = "dashed",
       color = color_celegans,
       alpha = 0.7
     ) +
-    
-    
+
+
     geom_point(shape = 16,
                size = 1.2,
                alpha = 0.3) +
     scale_color_manual(values = c(color_human, color_yeast, color_ecoli, color_celegans)) +
     scale_fill_manual(values = c(color_human, color_yeast, color_ecoli, color_celegans)) +
-    
+
     labs(subtitle = a.subtitle,
          caption = a.caption) +
-    
+
     theme(
       panel.background  = element_blank(),
       plot.background = element_rect(fill = "white", color = "white"),
-      
+
       plot.title = element_text(
         hjust = 0.5,
         face = "bold",
@@ -2328,7 +2329,7 @@ f.p.facet <- function(a.df,
         angle = 0,
         margin = margin(0, 0, 0.0, 0)
       ),
-      
+
       plot.subtitle = element_text(
         hjust = 0.5,
         face = "plain",
@@ -2337,7 +2338,7 @@ f.p.facet <- function(a.df,
         angle = 0,
         margin = margin(0, 0, 1, 0)
       ),
-      
+
       plot.caption = element_text(
         hjust = -0.1,
         face = "italic",
@@ -2346,7 +2347,7 @@ f.p.facet <- function(a.df,
         angle = 0,
         margin = margin(5, 0,-4, 0)
       ),
-      
+
       axis.text.x = element_text(
         face = "plain",
         color = 'black',
@@ -2354,7 +2355,7 @@ f.p.facet <- function(a.df,
         angle = 0,
         margin = margin(2, 0, 0, 0)
       ),
-      
+
       axis.text.y = element_text(
         face = "plain",
         color = 'black',
@@ -2362,7 +2363,7 @@ f.p.facet <- function(a.df,
         angle = 0,
         margin = margin(0, 2, 0, 0)
       ),
-      
+
       axis.title.y = element_text(
         face = "plain",
         color = 'black',
@@ -2370,22 +2371,22 @@ f.p.facet <- function(a.df,
         angle = 90,
         margin = margin(0, 4, 0, 0)
       ),
-      
+
       panel.grid.major = element_blank(),
       panel.grid.minor = element_blank(),
-      
+
       axis.line = element_line(
         size = 0.3,
         linetype = "solid",
         color = "black"
       ),
-      
+
       axis.ticks = element_line(
         size = 0.3,
         linetype = "solid",
         color = "black"
       ),
-      
+
       axis.title.x = element_text(
         hjust = 0.5,
         face = "plain",
@@ -2394,14 +2395,14 @@ f.p.facet <- function(a.df,
         angle = 0,
         margin = margin(4, 0, 0, 0)
       ),
-      
+
       legend.title = element_blank(),
       legend.background = element_rect(
         fill = "transparent",
         color = NA,
         size = 0.1
       ),
-      
+
       legend.key = element_rect(fill = "transparent", color = NA),
       legend.key.height = unit(0, "cm"),
       legend.margin = margin(3, 0, 0, 0),
@@ -2486,7 +2487,7 @@ f.p.volcano <- function(a.df,
            color = Species,
            fill = Species
          )) +
-    
+
 
     geom_hline(
       yintercept = -log10(alpha_limma),
@@ -2494,28 +2495,28 @@ f.p.volcano <- function(a.df,
       color = "grey60",
       alpha = 0.8
     ) +
-    
+
     geom_vline(
       xintercept = c(-limit_FC,+limit_FC),
       linetype = c("dotted", "dotted"),
       color = c("grey60", "grey60"),
       alpha = c(0.8, 0.8)
     ) +
-    
+
     geom_point(shape = 16,
                size = 1.2,
                alpha = 0.3) +
-    
+
     scale_color_manual(values = c(color_human, color_yeast, color_ecoli, color_celegans)) +
     scale_fill_manual(values = c(color_human, color_yeast, color_ecoli, color_celegans)) +
-    
+
     labs(subtitle = a.subtitle,
          caption = a.caption) +
-    
+
     theme(
       panel.background  = element_blank(),
       plot.background = element_rect(fill = "white", color = "white"),
-      
+
       plot.title = element_text(
         hjust = 0.5,
         face = "bold",
@@ -2524,7 +2525,7 @@ f.p.volcano <- function(a.df,
         angle = 0,
         margin = margin(0, 0, 0.0, 0)
       ),
-      
+
       plot.subtitle = element_text(
         hjust = 0.5,
         face = "plain",
@@ -2533,7 +2534,7 @@ f.p.volcano <- function(a.df,
         angle = 0,
         margin = margin(0, 0, 1, 0)
       ),
-      
+
       plot.caption = element_text(
         hjust = -0.1,
         face = "italic",
@@ -2542,7 +2543,7 @@ f.p.volcano <- function(a.df,
         angle = 0,
         margin = margin(5, 0,-4, 0)
       ),
-      
+
       axis.text.x = element_text(
         face = "plain",
         color = 'black',
@@ -2550,7 +2551,7 @@ f.p.volcano <- function(a.df,
         angle = 0,
         margin = margin(2, 0, 0, 0)
       ),
-      
+
       axis.text.y = element_text(
         face = "plain",
         color = 'black',
@@ -2558,7 +2559,7 @@ f.p.volcano <- function(a.df,
         angle = 0,
         margin = margin(0, 2, 0, 0)
       ),
-      
+
       axis.title.y = element_text(
         face = "plain",
         color = 'black',
@@ -2566,22 +2567,22 @@ f.p.volcano <- function(a.df,
         angle = 90,
         margin = margin(0, 4, 0, 0)
       ),
-      
+
       panel.grid.major = element_blank(),
       panel.grid.minor = element_blank(),
-      
+
       axis.line = element_line(
         size = 0.3,
         linetype = "solid",
         color = "black"
       ),
-      
+
       axis.ticks = element_line(
         size = 0.3,
         linetype = "solid",
         color = "black"
       ),
-      
+
       axis.title.x = element_text(
         hjust = 0.5,
         face = "plain",
@@ -2590,14 +2591,14 @@ f.p.volcano <- function(a.df,
         angle = 0,
         margin = margin(4, 0, 0, 0)
       ),
-      
+
       legend.title = element_blank(),
       legend.background = element_rect(
         fill = "transparent",
         color = NA,
         size = 0.1
       ),
-      
+
       legend.key = element_rect(fill = "transparent", color = NA),
       legend.key.height = unit(0, "cm"),
       legend.margin = margin(3, 0, 5, 0),
@@ -2614,7 +2615,7 @@ f.p.volcano <- function(a.df,
         margin = margin(0, 0, 0, 0)
       )
     ) +
-    
+
     coord_cartesian(xlim = c(FC_min, FC_max),
                     ylim = c(0,10)) +
     scale_x_continuous(
